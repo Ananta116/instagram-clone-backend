@@ -36,13 +36,14 @@ export class UsersController {
 
       const stats = await prisma.users.aggregate({
         // aggregate
-        _count: {_all: true},
-        _max: {createdAt: true},
-        _min: {createdAt: true}
-      })
+        _count: { _all: true },
+        _max: { createdAt: true },
+        _min: { createdAt: true },
+      });
       res.status(200).send({
         message: "users data ",
-        data: users, stats,
+        data: users,
+        stats,
       });
     } catch (error) {
       console.log(error);
@@ -80,6 +81,25 @@ export class UsersController {
   async delUser(req: Request, res: Response) {
     try {
       const { id } = req.params;
+    } catch (error) {
+      console.log(error);
+      res.status(400).send(error);
+    }
+  }
+
+  async getUserPosts(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+
+      const user = await prisma.users.findUnique({
+        where: { id: +id },
+        include: { Posts : true },
+      });
+
+      res.status(200).send({
+        message: "User's Posts",
+        posts: user,
+      });
     } catch (error) {
       console.log(error);
       res.status(400).send(error);

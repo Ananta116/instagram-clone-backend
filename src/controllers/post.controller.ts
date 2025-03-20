@@ -32,6 +32,8 @@ export class PostController {
     }
   }
 
+  
+
   async createPost(req: Request, res: Response) {
     try {
         const { imageUrl, caption, userId } = req.body;
