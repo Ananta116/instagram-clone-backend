@@ -17,7 +17,7 @@ export class PostController {
           user: {
             select: {
               username: true,
-              email: true,
+              avatar: true,
             },
           },
         },

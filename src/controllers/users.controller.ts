@@ -5,9 +5,9 @@ import { Prisma } from "../../prisma/generated/client";
 export class UsersController {
   async createUser(req: Request, res: Response) {
     try {
-      const { username, email, password } = req.body;
+      const { username, email, password, fullname } = req.body;
       const user = await prisma.users.create({
-        data: { username, email, password },
+        data: { username, email, password, fullname },
       });
       res.status(200).send({
         message: "data added✅",
@@ -66,9 +66,8 @@ export class UsersController {
   }
   async updateUser(req: Request, res: Response) {
     try {
-      const { id } = req.params;
       const data: Prisma.UsersUpdateInput = req.body;
-      await prisma.users.update({ where: { id: +id }, data });
+      await prisma.users.update({ where: { id: req.user?.id }, data });
       res.status(200).send({
         message: "user updated✅",
       });
@@ -89,10 +88,8 @@ export class UsersController {
 
   async getUserPosts(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-
       const user = await prisma.users.findUnique({
-        where: { id: +id },
+        where: { id: req.user?.id},
         include: { Posts : true },
       });
 
