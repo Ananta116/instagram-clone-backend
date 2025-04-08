@@ -33,7 +33,7 @@ export class AuthController {
       if (!isValidPass) throw { message: "Incorrect password" };
 
       const payload = { id: user.id, role: "user" };
-      const access_token = sign(payload, process.env.KEY_JWT!, { expiresIn: "10m" });
+      const access_token = sign(payload, process.env.KEY_JWT!, { expiresIn: "1h" });
 
       res.status(200).send({
         message: "Login success",
