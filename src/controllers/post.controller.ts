@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../prisma";
+import { cloudinaryUpload } from "../helpers/cloudinary";
 
 export class PostController {
   async getPost(req: Request, res: Response) {
@@ -21,6 +22,7 @@ export class PostController {
             },
           },
         },
+        orderBy: { createdAt: "desc" },
       });
       res.status(200).send({
         message: "Data Post",
@@ -32,71 +34,81 @@ export class PostController {
     }
   }
 
-  
-
   async createPost(req: Request, res: Response) {
     try {
-        const { imageUrl, caption, userId } = req.body;
+      if (!req.file) throw { message: "Image Empty" };
+      const { caption } = req.body;
+      const imageUrl = `http://localhost:8000/api/public/${req.file.filename}`;
 
-        const newPost = await prisma.posts.create({
-            data: {
-                imageUrl,
-                caption,
-                user: {
-                    connect: {
-                        id: userId,
-                    },
-                },
-            },
-        });
-
-        res.status(201).send({
-            message: "Post created successfully",
-            post: newPost,
-        });
+      await prisma.posts.create({
+        data: { imageUrl, caption, usersId: req.user?.id! },
+      });
+      res.status(201).send({
+        message: "Post Created!",
+      });
     } catch (error) {
       console.log(error);
       res.status(400).send(error);
     }
   }
 
-  async updatePost(req: Request, res:Response){
+  async updatePost(req: Request, res: Response) {
     try {
-        const { id } = req.params;
-        const { imageUrl, caption } = req.body;
+      const { id } = req.params;
+      const { imageUrl, caption } = req.body;
 
-        const updatedPost = await prisma.posts.update({
-            where: { id: +id },
-            data: {
-                imageUrl,
-                caption,
-            },
-        });
+      const updatedPost = await prisma.posts.update({
+        where: { id: +id },
+        data: {
+          imageUrl,
+          caption,
+        },
+      });
 
-        res.status(200).send({
-            message: "Post updated successfully",
-            post: updatedPost,
-        });
+      res.status(200).send({
+        message: "Post updated successfully",
+        post: updatedPost,
+      });
     } catch (error) {
-        console.log(error)
-        res.status(400).send(error)
+      console.log(error);
+      res.status(400).send(error);
     }
   }
 
-  async delPost(req: Request, res:Response){
+  async delPost(req: Request, res: Response) {
     try {
-        const { id } = req.params;
+      const { id } = req.params;
 
-        await prisma.posts.delete({
-            where: { id: +id },
-        });
+      await prisma.posts.delete({
+        where: { id: +id },
+      });
 
-        res.status(200).send({
-            message: "Post deleted successfully",
-        });
+      res.status(200).send({
+        message: "Post deleted successfully",
+      });
     } catch (error) {
-        console.log(error)
-        res.status(400).send(error)
+      console.log(error);
+      res.status(400).send(error);
+    }
+  }
+
+  async createPostCloud(req: Request, res: Response) {
+    try {
+      if (!req.file) throw { message: "image empty" };
+      const { caption } = req.body;
+      const { secure_url } = await cloudinaryUpload(req.file, "ig");
+
+      await prisma.posts.create({
+        data: { imageUrl: secure_url, caption, usersId: req.user?.id! },
+      });
+
+      res.status(201).send({
+        message: "Post Created",
+        secure_url,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(400).send(error);
     }
   }
 }

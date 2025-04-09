@@ -27,7 +27,7 @@ export class AuthController {
       const templatePath = path.join(__dirname, "../templates", `verify.hbs`);
       const templateSource = fs.readFileSync(templatePath, "utf-8");
       const compiledTemplate = handlebars.compile(templateSource);
-      const html = compiledTemplate({ username });
+      const html = compiledTemplate({ username,link });
 
       await transporter.sendMail({
         from: process.env.GMAIL_USER,
@@ -49,6 +49,10 @@ export class AuthController {
       const { email, password } = req.body;
       const user = await prisma.users.findUnique({ where: { email } });
       if (!user) throw { message: "User not found" };
+      if (!user.isVerify)
+        throw {
+          message: "Account Not Verified",
+        };
 
       const isValidPass = await compare(password, user.password);
       if (!isValidPass) throw { message: "Incorrect password" };
