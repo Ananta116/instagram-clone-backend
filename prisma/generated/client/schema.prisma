@@ -22,11 +22,12 @@ model Users {
   username  String   @unique
   fullname  String?
   bio       String?  @db.Text
-  avatar    String?
+  avatar    String?  @default("https://res.cloudinary.com/dn6uglajh/image/upload/v1733990935/blank-image_yfczs3.jpg")
   isVerify  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   Posts     Posts[]
+  Likes     Likes[]
 }
 
 model Posts {
@@ -37,4 +38,16 @@ model Posts {
   updatedAt DateTime @updatedAt
   user      Users    @relation(fields: [usersId], references: [id])
   usersId   Int
+  Likes     Likes[]
+}
+
+model Likes {
+  postId    Int
+  userId    Int
+  createdAt DateTime @default(now())
+
+  user Users @relation(fields: [userId], references: [id])
+  post Posts @relation(fields: [postId], references: [id])
+
+  @@id([userId, postId])
 }

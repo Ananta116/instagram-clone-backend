@@ -15,7 +15,16 @@ export class PostRouter {
     this.initializeRoute();
   }
   private initializeRoute() {
-    this.router.get("/", this.postController.getPost);
+    this.router.post(
+      "/like",
+      this.authMiddleware.verifyToken,
+      this.postController.likeUnlike
+    );
+    this.router.get(
+      "/",
+      this.authMiddleware.verifyToken,
+      this.postController.getPost
+    );
     this.router.post(
       "/",
       uploader("diskStorage", "ig-").single("image"),

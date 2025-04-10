@@ -139,6 +139,12 @@ exports.Prisma.PostsScalarFieldEnum = {
   usersId: 'usersId'
 };
 
+exports.Prisma.LikesScalarFieldEnum = {
+  postId: 'postId',
+  userId: 'userId',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -157,7 +163,8 @@ exports.Prisma.NullsOrder = {
 
 exports.Prisma.ModelName = {
   Users: 'Users',
-  Posts: 'Posts'
+  Posts: 'Posts',
+  Likes: 'Likes'
 };
 
 /**
